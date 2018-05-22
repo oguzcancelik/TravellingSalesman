@@ -2,44 +2,65 @@ import math
 from random import randint
 
 
-def findClosest(i, data):
+def findClosest(x, data):
     dist = []
-    global visited
-    x = data.index([x for x in data if i in x][0])
+    global visited, totalDist
     visited.append(data[x][0])
-    # visited.append('x:  ' + str(x))
-    for j in data:
-        dist.append([j[0], round(
-            math.sqrt(math.pow(data[x][1] - j[1], 2) + math.pow(data[x][2] - j[2], 2)))])
+    for j in range(len(data)):
+        dist.append([j, round(
+            math.sqrt(math.pow(data[x][1] - data[j][1], 2) + math.pow(data[x][2] - data[j][2], 2)))])
     dist = sorted(dist, key=lambda row: row[1])
-    if len(data) == 1:
-        return 0
     data.pop(x)
-    return dist[1][1] + findClosest(dist[1][0], data)
+    totalDist += dist[1][1]
+    if dist[1][0] > x:
+        return dist[1][0] - 1
+    return dist[1][0]
 
 
 data = [[]]
 visited = []
-
+totalDist = 0
 with open('text3.txt') as file:
     lines = file.readlines()
 file.close()
+
 for i in range(len(lines)):
     temp = [int(j) for j in lines[i].split()]
     data.insert(i, temp)
 data.pop()
-
-randNum = randint(0, len(lines) - 1)
-# randNum = 0
+d2 = list(data)
+# randNum = randint(0, len(lines) - 1)
+randNum = 0
+print(randNum)
 temp = data[randNum]
-counter = 0
-totalDist = findClosest(randNum, data) + round(
-    math.sqrt(math.pow(temp[1] - data[0][1], 2) + math.pow(temp[2] - data[0][2], 2)))
+par = randNum
+
+while len(data) != 1:
+    par = findClosest(par, data)
+
+totalDist += round(math.sqrt(math.pow(temp[1] - data[0][1], 2) + math.pow(temp[2] - data[0][2], 2)))
+
+visited.append(data[0][0])
+
+for k in range(2):
+    for i in range(len(visited)):
+        for j in range(i + 2, len(visited) - 1):
+            temp = round(math.sqrt(math.pow(d2[visited[i]][1] - d2[visited[i+1]][1], 2) + math.pow(d2[visited[i]][2] - d2[visited[i+1]][2], 2))) + \
+                   round(math.sqrt(math.pow(d2[visited[j-1]][1] - d2[visited[j]][1], 2) + math.pow(d2[visited[j-1]][2] - d2[visited[j]][2], 2))) + \
+                   round(math.sqrt(math.pow(d2[visited[j+1]][1] - d2[visited[j]][1], 2) + math.pow(d2[visited[j+1]][2] - d2[visited[j]][2], 2))) - \
+                   round(math.sqrt(math.pow(d2[visited[j]][1] - d2[visited[i]][1], 2) + math.pow(d2[visited[j]][2] - d2[visited[i]][2], 2))) - \
+                   round(math.sqrt(math.pow(d2[visited[j]][1] - d2[visited[i+1]][1], 2) + math.pow(d2[visited[j]][2] - d2[visited[i+1]][2], 2))) - \
+                   round(math.sqrt(math.pow(d2[visited[j-1]][1] - d2[visited[j+1]][1], 2) + math.pow(d2[visited[j-1]][2] - d2[visited[j+1]][2], 2)))
+            if temp > 0:
+                visited.insert(i + 1, visited[j])
+                del visited[j + 1]
+                totalDist -= temp
+    print(totalDist)
+
 
 visited.insert(0, totalDist)
-
+print(totalDist)
 file = open('output.txt', 'w')
-print(visited[0])
 for i in visited:
     file.write("%s\n" % i)
 file.close()
