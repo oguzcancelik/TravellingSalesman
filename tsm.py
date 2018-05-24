@@ -1,8 +1,7 @@
-import math
+import math, sys, os
 from random import randint
+# from matplotlib import pyplot as plt
 
-
-# ilk seçimde random yap, sonra ikili kontrol et
 
 def findClosest(x, data):
     dist = []
@@ -19,26 +18,24 @@ def findClosest(x, data):
     return dist[1][0]
 
 
-def random(data,d2):
-    global visited, totalDist
-    while len(data) != 1:
-        randNum = randint(0, len(data) - 2)
-        visited.append(data[randNum][0])
-        data.pop(randNum)
-    visited.append(data[0][0])
-    # print(visited)
-    totalDist = 0
-    for i in range(len(visited) - 2):
-        totalDist += round(math.sqrt(math.pow(d2[visited[i]][1] - d2[visited[i + 1]][1], 2) + math.pow(
-            d2[visited[i]][2] - d2[visited[i + 1]][2], 2)))
-    totalDist += round(
-        math.sqrt(math.pow(d2[visited[i]][1] - data[0][1], 2) + math.pow(d2[visited[i]][2] - data[0][2], 2)))
+def plot():
+    global visited
+    XX = []
+    YY = []
+    for k in range(len(visited) - 1):
+        XX.append(d2[visited[k]][1])
+        YY.append(d2[visited[k]][2])
+    # XX.append(d2[0][1])
+    # YY.append(d2[0][2])
+    plt.plot(XX, YY)
+    plt.show()
 
 
 data = [[]]
 visited = []
 totalDist = 0
-with open('text1.txt') as file:
+filename = 'g.txt'
+with open(filename) as file:
     lines = file.readlines()
 file.close()
 
@@ -47,46 +44,60 @@ for i in range(len(lines)):
     data.insert(i, temp)
 data.pop()
 d2 = list(data)
-randNum = randint(0, len(lines) - 1)
-# randNum = 0
-print(randNum)
+# randNum = randint(0, len(lines) - 1)
+randNum = 0
+print('randNum: ', randNum)
 temp = data[randNum]
 par = randNum
 
-# while len(data) != 1:
-#     par = findClosest(par, data)
-#
-# totalDist += round(math.sqrt(math.pow(temp[1] - data[0][1], 2) + math.pow(temp[2] - data[0][2], 2)))
-#
-# visited.append(data[0][0])
+while len(data) != 1:
+    par = findClosest(par, data)
+    print(par)
 
-random(data,d2)
+totalDist += round(math.sqrt(math.pow(temp[1] - data[0][1], 2) + math.pow(temp[2] - data[0][2], 2)))
 
-for k in range(10):
-    for i in range(len(visited)):
-        for j in range(i + 2, len(visited) - 1):
-            calc = round(math.sqrt(math.pow(d2[visited[i]][1] - d2[visited[i + 1]][1], 2) + math.pow(
-                d2[visited[i]][2] - d2[visited[i + 1]][2], 2))) + \
-                   round(math.sqrt(math.pow(d2[visited[j - 1]][1] - d2[visited[j]][1], 2) + math.pow(
-                       d2[visited[j - 1]][2] - d2[visited[j]][2], 2))) + \
-                   round(math.sqrt(math.pow(d2[visited[j + 1]][1] - d2[visited[j]][1], 2) + math.pow(
-                       d2[visited[j + 1]][2] - d2[visited[j]][2], 2))) - \
-                   round(math.sqrt(math.pow(d2[visited[j]][1] - d2[visited[i]][1], 2) + math.pow(
-                       d2[visited[j]][2] - d2[visited[i]][2], 2))) - \
-                   round(math.sqrt(math.pow(d2[visited[j]][1] - d2[visited[i + 1]][1], 2) + math.pow(
-                       d2[visited[j]][2] - d2[visited[i + 1]][2], 2))) - \
-                   round(math.sqrt(math.pow(d2[visited[j - 1]][1] - d2[visited[j + 1]][1], 2) + math.pow(
-                       d2[visited[j - 1]][2] - d2[visited[j + 1]][2], 2)))
-            if calc > 0:
-                visited.insert(i + 1, visited[j])
-                del visited[j + 1]
-                totalDist -= calc
-    print(totalDist)
+visited.append(data[0][0])
+visited.append(d2[randNum][0])
+print('totalDist: ', totalDist)
+# for k in range(5):
+# while 1:
+#     oldTotalDist = totalDist
+for i in range(len(visited)):
+    for j in range(i + 2, len(visited) - 1):
+        calc = round(math.sqrt(math.pow(d2[visited[i]][1] - d2[visited[i + 1]][1], 2) + math.pow(
+            d2[visited[i]][2] - d2[visited[i + 1]][2], 2))) + \
+               round(math.sqrt(math.pow(d2[visited[j - 1]][1] - d2[visited[j]][1], 2) + math.pow(
+                   d2[visited[j - 1]][2] - d2[visited[j]][2], 2))) + \
+               round(math.sqrt(math.pow(d2[visited[j + 1]][1] - d2[visited[j]][1], 2) + math.pow(
+                   d2[visited[j + 1]][2] - d2[visited[j]][2], 2))) - \
+               round(math.sqrt(math.pow(d2[visited[j]][1] - d2[visited[i]][1], 2) + math.pow(
+                   d2[visited[j]][2] - d2[visited[i]][2], 2))) - \
+               round(math.sqrt(math.pow(d2[visited[j]][1] - d2[visited[i + 1]][1], 2) + math.pow(
+                   d2[visited[j]][2] - d2[visited[i + 1]][2], 2))) - \
+               round(math.sqrt(math.pow(d2[visited[j - 1]][1] - d2[visited[j + 1]][1], 2) + math.pow(
+                   d2[visited[j - 1]][2] - d2[visited[j + 1]][2], 2)))
+        if calc > 0:
+            visited.insert(i + 1, visited[j])
+            del visited[j + 1]
+            totalDist -= calc
+    print(i)
+print('totalDist: ', totalDist)
+    # if oldTotalDist == totalDist:
+    #     break
 
-quit()
+visited.pop()
+
+# plot()
 visited.insert(0, totalDist)
-print(totalDist)
-file = open('output.txt', 'w')
+for i in visited:
+    print(i)
+outfile = "output"+filename
+file = open(outfile, 'w')
 for i in visited:
     file.write("%s\n" % i)
 file.close()
+
+# sys.exit(totalDist)
+# outfile = "python tsp-verifier.py " + filename+ " output"+filename
+# os.system(outfile)
+# print(outfile)
